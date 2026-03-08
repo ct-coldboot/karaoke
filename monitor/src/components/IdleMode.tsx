@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import BigEchoLogo from './BigEchoLogo';
+import BigInuLogo from './BigInuLogo';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 
 function useControllerUrl() {
@@ -85,7 +85,7 @@ export default function IdleMode() {
       <canvas ref={canvasRef} style={styles.canvas} />
       <div style={styles.glow} />
       <div style={styles.logoWrap}>
-        <BigEchoLogo width={520} />
+        <BigInuLogo width={520} />
       </div>
       <div style={styles.subtitle}>
         ♪ &nbsp; Search for a song on your phone to get started &nbsp; ♪

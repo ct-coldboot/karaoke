@@ -16,7 +16,7 @@ export default function HomeScreen({ queueState, name, onNameChange, onGoSearch 
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.logoStrip}>
-          <div style={styles.logoText}>BIG ECHO</div>
+          <div style={styles.logoText}>BIG INU</div>
           <div style={styles.logoSub}>Karaoke Entertainment</div>
         </div>
 

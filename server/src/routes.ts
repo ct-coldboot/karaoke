@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 import * as os from 'os';
 import { searchYouTube, getStreamUrl } from './youtube';
 import { getSpotifyAccessToken } from './spotify';
+import https from 'https';
 
 const router = Router();
 
@@ -36,6 +37,37 @@ const streamLimiter = rateLimit({
   message: { error: 'Too many stream requests, please slow down' },
   standardHeaders: true,
   legacyHeaders: false,
+});
+
+const VALID_TTS_LANGS = new Set(['ja', 'en', 'ko', 'zh-CN', 'zh-TW', 'es', 'fr', 'de']);
+
+router.get('/tts', (req: Request, res: Response) => {
+  const text = (req.query.text as string | undefined)?.trim();
+  const lang = (req.query.lang as string | undefined) ?? 'ja';
+
+  if (!text || text.length > 300) {
+    res.status(400).json({ error: 'Missing or too-long text' });
+    return;
+  }
+  if (!VALID_TTS_LANGS.has(lang)) {
+    res.status(400).json({ error: 'Invalid lang' });
+    return;
+  }
+
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+  const request = https.get(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+  }, (upstream) => {
+    if (upstream.statusCode !== 200) {
+      res.status(502).json({ error: 'TTS upstream error' });
+      upstream.resume();
+      return;
+    }
+    res.setHeader('Content-Type', upstream.headers['content-type'] ?? 'audio/mpeg');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    upstream.pipe(res);
+  });
+  request.on('error', () => res.status(502).json({ error: 'TTS request failed' }));
 });
 
 const VALID_LANGS = new Set(['all', 'en', 'ja']);

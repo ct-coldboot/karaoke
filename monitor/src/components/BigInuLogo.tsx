@@ -4,7 +4,7 @@ interface Props {
   width?: number;
 }
 
-export default function BigEchoLogo({ width = 480 }: Props) {
+export default function BigInuLogo({ width = 480 }: Props) {
   const h = Math.round(width * 0.42);
   return (
     <svg width={width} height={h} viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@ export default function BigEchoLogo({ width = 480 }: Props) {
         Karaoke Entertainment
       </text>
 
-      {/* "BIG ECHO" — large, bold, centered */}
+      {/* "BIG INU" — large, bold, centered */}
       <text
         x="240"
         y="138"
@@ -36,7 +36,7 @@ export default function BigEchoLogo({ width = 480 }: Props) {
         fontSize="88"
         letterSpacing="-1"
       >
-        BIG ECHO
+        BIG INU
       </text>
 
       {/* Yellow swoosh arc below text */}

@@ -50,6 +50,11 @@ async function startPlaylist(id: string, token: string, attempt = 0): Promise<vo
     await new Promise((r) => setTimeout(r, 1500));
     return startPlaylist(id, token, attempt + 1);
   }
+  // Enable shuffle so songs don't repeat in the same order each session
+  await fetch(`https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 async function pausePlayback(id: string, token: string): Promise<void> {
@@ -66,7 +71,7 @@ function ensureSDK() {
   function initPlayer() {
     fetchToken().then((token) => {
       const player = new window.Spotify.Player({
-        name: 'Big Echo Home Karaoke',
+        name: 'Big Inu Home Karaoke',
         getOAuthToken: (cb) => { fetchToken().then(cb).catch(() => cb('')); },
         volume: 0.4,
       });

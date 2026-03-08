@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Song } from '@karaoke/shared';
-import BigEchoLogo from './BigEchoLogo';
+import BigInuLogo from './BigInuLogo';
+import { speakTTS, cancelTTS } from '../utils/tts';
 
 interface Props {
   song: Song;
@@ -15,13 +16,8 @@ const INTROS = [
 ];
 
 function announce(title: string, artist: string) {
-  window.speechSynthesis.cancel();
   const template = INTROS[Math.floor(Math.random() * INTROS.length)];
-  const utt = new SpeechSynthesisUtterance(template(title, artist));
-  utt.lang = 'ja-JP';
-  utt.rate = 0.95;
-  utt.pitch = 1.1;
-  window.speechSynthesis.speak(utt);
+  speakTTS(template(title, artist), 'ja-JP', { rate: 0.95, pitch: 1.1 });
 }
 
 export default function TransitionScreen({ song }: Props) {
@@ -33,7 +29,7 @@ export default function TransitionScreen({ song }: Props) {
 
   useEffect(() => {
     announce(song.title, song.artist);
-    return () => { window.speechSynthesis.cancel(); };
+    return () => { cancelTTS(); };
   }, [song.title, song.artist]);
 
   return (
@@ -54,7 +50,7 @@ export default function TransitionScreen({ song }: Props) {
       </div>
       <div style={styles.bottomStripe} />
       <div style={styles.watermark}>
-        <BigEchoLogo width={160} />
+        <BigInuLogo width={160} />
       </div>
     </div>
   );
