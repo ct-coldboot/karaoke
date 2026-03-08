@@ -1,9 +1,26 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
+import * as os from 'os';
 import { searchYouTube, getStreamUrl } from './youtube';
 import { getSpotifyAccessToken } from './spotify';
 
 const router = Router();
+
+function getLocalIP(): string {
+  const interfaces = os.networkInterfaces();
+  for (const ifaces of Object.values(interfaces)) {
+    for (const iface of ifaces ?? []) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
+router.get('/info', (_req, res) => {
+  res.json({ ip: getLocalIP(), controllerPort: 5174 });
+});
 
 const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute

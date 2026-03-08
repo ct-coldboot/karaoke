@@ -1,9 +1,38 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import QRCode from 'qrcode';
 import BigEchoLogo from './BigEchoLogo';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 
+function useControllerUrl() {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    fetch('/api/info')
+      .then((r) => r.json())
+      .then((d: { ip: string; controllerPort: number }) => {
+        setUrl(`http://${d.ip}:${d.controllerPort}`);
+      })
+      .catch(() => {});
+  }, []);
+  return url;
+}
+
+function QRCodeCanvas({ url }: { url: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      QRCode.toCanvas(ref.current, url, {
+        width: 200,
+        margin: 2,
+        color: { dark: '#000000', light: '#ffffff' },
+      }).catch(() => {});
+    }
+  }, [url]);
+  return <canvas ref={ref} />;
+}
+
 export default function IdleMode() {
   useAnnouncements(true);
+  const controllerUrl = useControllerUrl();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -61,6 +90,17 @@ export default function IdleMode() {
       <div style={styles.subtitle}>
         ♪ &nbsp; Search for a song on your phone to get started &nbsp; ♪
       </div>
+      <div style={styles.subtitleJa}>
+        ♪ &nbsp; スマホで曲を検索して、カラオケを始めましょう &nbsp; ♪
+      </div>
+
+      {controllerUrl && (
+        <div style={styles.qrWrap}>
+          <QRCodeCanvas url={controllerUrl} />
+          <div style={styles.qrLabel}>Scan to control</div>
+        </div>
+      )}
+
       <div style={{ ...styles.corner, top: 24, left: 24 }}>
         {(['#ff0066', '#00eeff', '#ffe600'] as const).map((c, i) => (
           <div key={i} style={{ ...styles.dot, background: c }} />
@@ -114,6 +154,36 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: 2,
     position: 'relative',
     zIndex: 1,
+  },
+  subtitleJa: {
+    marginTop: 10,
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 20,
+    fontFamily: 'system-ui, sans-serif',
+    letterSpacing: 1,
+    position: 'relative',
+    zIndex: 1,
+  },
+  qrWrap: {
+    marginTop: 28,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 8,
+    position: 'relative',
+    zIndex: 1,
+    background: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    boxShadow: '0 0 30px rgba(255,0,102,0.4)',
+  },
+  qrLabel: {
+    color: '#000',
+    fontSize: 13,
+    fontWeight: 700,
+    fontFamily: 'system-ui, sans-serif',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   corner: {
     position: 'absolute',
