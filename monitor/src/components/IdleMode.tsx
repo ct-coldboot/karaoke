@@ -1,41 +1,77 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import BigEchoLogo from './BigEchoLogo';
+import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
+import { useAnnouncements } from '../hooks/useAnnouncements';
 
 export default function IdleMode() {
+  useSpotifyPlayer(true);
+  useAnnouncements(true);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const COLORS = ['#ff0066', '#00eeff', '#ffe600', '#cc00ff', '#ffffff'];
+    const particles = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 0.5,
+      dx: (Math.random() - 0.5) * 0.4,
+      dy: (Math.random() - 0.5) * 0.4,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: Math.random() * 0.6 + 0.2,
+    }));
+
+    let animId: number;
+
+    function draw() {
+      if (!canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+      }
+      ctx.globalAlpha = 1;
+      animId = requestAnimationFrame(draw);
+    }
+
+    draw();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
   return (
     <div style={styles.container}>
-      {/* Top accent bar */}
-      <div style={styles.topBar}>
-        <span style={styles.topBarNote}>♪</span>
-        <span style={styles.topBarText}>NOW ACCEPTING REQUESTS</span>
-        <span style={styles.topBarNote}>♬</span>
+      <canvas ref={canvasRef} style={styles.canvas} />
+      <div style={styles.glow} />
+      <div style={styles.logoWrap}>
+        <BigEchoLogo width={520} />
       </div>
-
-      {/* Center logo block */}
-      <div style={styles.center}>
-        {/* Logo badge */}
-        <div style={styles.badge}>
-          <div style={styles.badgeInner}>
-            <div style={styles.badgeKana}>カラオケ</div>
-            <div style={styles.badgeLatin}>KARAOKE HOME</div>
-          </div>
-          <div style={styles.badgeNote}>♩</div>
-        </div>
-
-        {/* Big tagline */}
-        <div style={styles.tagline}>うたおう！</div>
-        <div style={styles.taglineSub}>Let's Sing!</div>
-
-        <div style={styles.dividerLine} />
-        <div style={styles.hint}>スマートフォンで曲を検索 · Search for a song on your phone</div>
+      <div style={styles.subtitle}>
+        ♪ &nbsp; Search for a song on your phone to get started &nbsp; ♪
       </div>
-
-      {/* Bottom bar */}
-      <div style={styles.bottomBar}>
-        <span style={styles.bottomBarItem}>♪ KARAOKE HOME</span>
-        <span style={styles.bottomBarDot}>◆</span>
-        <span style={styles.bottomBarItem}>HIGH QUALITY KARAOKE</span>
-        <span style={styles.bottomBarDot}>◆</span>
-        <span style={styles.bottomBarItem}>ENJOY YOUR SONG ♪</span>
+      <div style={{ ...styles.corner, top: 24, left: 24 }}>
+        {(['#ff0066', '#00eeff', '#ffe600'] as const).map((c, i) => (
+          <div key={i} style={{ ...styles.dot, background: c }} />
+        ))}
+      </div>
+      <div style={{ ...styles.corner, top: 24, right: 24, flexDirection: 'row-reverse' as const }}>
+        {(['#cc00ff', '#00eeff', '#ff0066'] as const).map((c, i) => (
+          <div key={i} style={{ ...styles.dot, background: c }} />
+        ))}
       </div>
     </div>
   );
@@ -45,132 +81,52 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     width: '100%',
     height: '100%',
-    background: 'linear-gradient(160deg, #1a0000 0%, #2d0010 25%, #0a0020 60%, #000 100%)',
+    background: '#0a0014',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    color: '#fff',
-    overflow: 'hidden',
+    justifyContent: 'center',
     position: 'relative',
+    overflow: 'hidden',
   },
-  topBar: {
-    width: '100%',
-    background: 'linear-gradient(90deg, #b80000, #e60026, #b80000)',
-    padding: '10px 32px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-    boxShadow: '0 4px 24px rgba(230,0,38,0.5)',
-    flexShrink: 0,
+  canvas: {
+    position: 'absolute',
+    inset: 0,
+    pointerEvents: 'none',
   },
-  topBarNote: {
-    fontSize: 22,
-    color: '#ffd700',
-    textShadow: '0 0 8px rgba(255,215,0,0.8)',
+  glow: {
+    position: 'absolute',
+    width: 700,
+    height: 400,
+    background: 'radial-gradient(ellipse, rgba(204,0,0,0.18) 0%, transparent 70%)',
+    pointerEvents: 'none',
+    zIndex: 0,
   },
-  topBarText: {
-    fontSize: 15,
-    fontWeight: 800,
-    letterSpacing: 6,
-    fontFamily: 'system-ui, sans-serif',
-    color: '#fff',
+  logoWrap: {
+    position: 'relative',
+    zIndex: 1,
+    filter: 'drop-shadow(0 0 40px rgba(204,0,0,0.6)) drop-shadow(0 4px 24px rgba(0,0,0,0.8))',
+    animation: 'logoPulse 3s ease-in-out infinite',
   },
-  center: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 0,
-  },
-  badge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 16,
-    background: 'linear-gradient(135deg, #cc0020, #ff1a3c)',
-    border: '3px solid #ffd700',
-    borderRadius: 8,
-    padding: '16px 40px',
-    marginBottom: 40,
-    boxShadow: '0 0 40px rgba(230,0,38,0.7), inset 0 1px 0 rgba(255,255,255,0.15)',
-  },
-  badgeInner: {
-    textAlign: 'center',
-  },
-  badgeKana: {
+  subtitle: {
+    marginTop: 40,
+    color: 'rgba(255,255,255,0.65)',
     fontSize: 20,
-    fontWeight: 900,
-    color: '#ffd700',
     fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 6,
-    textShadow: '0 0 12px rgba(255,215,0,0.6)',
+    letterSpacing: 2,
+    position: 'relative',
+    zIndex: 1,
   },
-  badgeLatin: {
-    fontSize: 32,
-    fontWeight: 900,
-    color: '#fff',
-    fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 4,
-    textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-  },
-  badgeNote: {
-    fontSize: 48,
-    color: '#ffd700',
-    textShadow: '0 0 16px rgba(255,215,0,0.8)',
-    lineHeight: 1,
-  },
-  tagline: {
-    fontSize: 72,
-    fontWeight: 900,
-    color: '#fff',
-    fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 12,
-    textShadow: '0 0 60px rgba(230,0,38,0.9), 0 0 120px rgba(230,0,38,0.4)',
-  },
-  taglineSub: {
-    fontSize: 28,
-    fontWeight: 300,
-    color: '#ffd700',
-    fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 16,
-    marginTop: 4,
-    textShadow: '0 0 20px rgba(255,215,0,0.6)',
-  },
-  dividerLine: {
-    width: 320,
-    height: 2,
-    background: 'linear-gradient(90deg, transparent, #e60026, #ffd700, #e60026, transparent)',
-    margin: '32px 0 20px',
-  },
-  hint: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.5)',
-    fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 1,
-    textAlign: 'center',
-  },
-  bottomBar: {
-    width: '100%',
-    background: 'rgba(0,0,0,0.6)',
-    borderTop: '2px solid #e60026',
-    padding: '10px 32px',
+  corner: {
+    position: 'absolute',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-    flexShrink: 0,
+    flexDirection: 'row',
+    gap: 8,
+    zIndex: 1,
   },
-  bottomBarItem: {
-    fontSize: 13,
-    fontWeight: 700,
-    letterSpacing: 3,
-    color: 'rgba(255,255,255,0.6)',
-    fontFamily: 'system-ui, sans-serif',
-  },
-  bottomBarDot: {
-    fontSize: 8,
-    color: '#e60026',
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
   },
 };
