@@ -2,9 +2,9 @@ import * as readline from 'readline';
 import * as https from 'https';
 import * as url from 'url';
 
-const CLIENT_ID     = process.env.SPOTIFY_CLIENT_ID!;
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET!;
-const REDIRECT_URI  = process.env.SPOTIFY_REDIRECT_URI!;
+const CLIENT_ID     = process.env.SPOTIFY_CLIENT_ID;
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+const REDIRECT_URI  = process.env.SPOTIFY_REDIRECT_URI;
 
 if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
   console.error('Missing env vars: SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI');
@@ -37,7 +37,13 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
 
 rl.question('Paste the redirect URL here: ', (redirectUrl) => {
   rl.close();
-  const parsed = new url.URL(redirectUrl);
+  let parsed: url.URL;
+  try {
+    parsed = new url.URL(redirectUrl);
+  } catch {
+    console.error('Invalid URL. Please paste the full redirect URL from the address bar.');
+    process.exit(1);
+  }
   const code = parsed.searchParams.get('code');
   if (!code) {
     console.error('No code found in URL. Did you paste the full redirect URL?');
@@ -66,9 +72,19 @@ rl.question('Paste the redirect URL here: ', (redirectUrl) => {
     let data = '';
     res.on('data', (chunk) => (data += chunk));
     res.on('end', () => {
-      const json = JSON.parse(data) as Record<string, unknown>;
+      if (res.statusCode !== 200) {
+        console.error(`Token exchange failed with status ${res.statusCode}.`);
+        process.exit(1);
+      }
+      let json: Record<string, unknown>;
+      try {
+        json = JSON.parse(data) as Record<string, unknown>;
+      } catch {
+        console.error('Failed to parse token response as JSON.');
+        process.exit(1);
+      }
       if (json.error) {
-        console.error('Token exchange failed:', json);
+        console.error('Token exchange failed:', json.error, json.error_description ?? '');
         process.exit(1);
       }
       console.log('\n=== SUCCESS ===\n');
@@ -78,7 +94,7 @@ rl.question('Paste the redirect URL here: ', (redirectUrl) => {
     });
   });
 
-  req.on('error', (err) => { console.error(err); process.exit(1); });
+  req.on('error', (err) => { console.error('Request error:', err.message); process.exit(1); });
   req.write(body);
   req.end();
 });
