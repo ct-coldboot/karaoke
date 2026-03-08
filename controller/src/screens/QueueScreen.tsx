@@ -6,6 +6,13 @@ interface Props {
   onRemove: (songId: string) => void;
 }
 
+function getPositionColor(position: number): string {
+  if (position === 1) return '#ff0066';
+  if (position === 2) return '#00eeff';
+  if (position === 3) return '#ffe600';
+  return 'rgba(255,255,255,0.5)';
+}
+
 export default function QueueScreen({ queueState, onRemove }: Props) {
   const { currentSong, queue, mode } = queueState;
 
@@ -13,15 +20,16 @@ export default function QueueScreen({ queueState, onRemove }: Props) {
     <div style={styles.container}>
       {mode !== 'idle' && currentSong && (
         <>
-          <div style={styles.sectionTitle}>Now Playing</div>
+          <div style={styles.sectionHeader}>
+            <span style={styles.nowPlayingBadge}>
+              {mode === 'transition' ? '⏳ Starting soon' : queueState.isPlaying ? '▶ Now Playing' : '⏸ Paused'}
+            </span>
+          </div>
           <div style={styles.nowPlayingCard}>
             <img src={currentSong.thumbnail} alt="" style={styles.thumb} />
             <div style={styles.info}>
               <div style={styles.songTitle}>{currentSong.title}</div>
               <div style={styles.songArtist}>{currentSong.artist}</div>
-              <div style={styles.nowPlayingBadge}>
-                {mode === 'transition' ? '⏳ Starting soon' : queueState.isPlaying ? '▶ Playing' : '⏸ Paused'}
-              </div>
             </div>
           </div>
         </>
@@ -30,29 +38,38 @@ export default function QueueScreen({ queueState, onRemove }: Props) {
       {queue.length > 0 && (
         <>
           <div style={styles.sectionTitle}>Up Next</div>
-          {queue.map((song, i) => (
-            <div key={song.id} style={styles.queueItem}>
-              <div style={styles.position}>{i + 1}</div>
-              <img src={song.thumbnail} alt="" style={styles.thumb} />
-              <div style={styles.info}>
-                <div style={styles.songTitle}>{song.title}</div>
-                <div style={styles.songArtist}>{song.artist}</div>
-              </div>
-              <button
-                style={styles.removeBtn}
-                onClick={() => onRemove(song.id)}
-                aria-label="Remove from queue"
+          {queue.map((song, i) => {
+            const posColor = getPositionColor(i + 1);
+            return (
+              <div
+                key={song.id}
+                style={{
+                  ...styles.queueItem,
+                  borderLeft: `3px solid ${posColor}`,
+                }}
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <div style={{ ...styles.position, color: posColor }}>{i + 1}</div>
+                <img src={song.thumbnail} alt="" style={styles.thumb} />
+                <div style={styles.info}>
+                  <div style={styles.songTitle}>{song.title}</div>
+                  <div style={styles.songArtist}>{song.artist}</div>
+                </div>
+                <button
+                  style={styles.removeBtn}
+                  onClick={() => onRemove(song.id)}
+                  aria-label="Remove from queue"
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </>
       )}
 
       {mode === 'idle' && queue.length === 0 && (
         <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>🎵</div>
+          <div style={styles.emptyIcon}>🎤</div>
           <div style={styles.emptyText}>Queue is empty</div>
           <div style={styles.emptyHint}>Search for a song to get started!</div>
         </div>
@@ -66,36 +83,58 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     overflowY: 'auto',
     padding: '8px 0',
+    background: '#0a0014',
+  },
+  sectionHeader: {
+    padding: '10px 16px 6px',
+  },
+  nowPlayingBadge: {
+    display: 'inline-block',
+    background: 'linear-gradient(135deg, #ff0066, #cc0099)',
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: 'system-ui, sans-serif',
+    fontWeight: 800,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    padding: '4px 12px',
+    borderRadius: 20,
   },
   sectionTitle: {
-    color: '#ffd700',
+    color: 'rgba(255,255,255,0.5)',
     fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 800,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    padding: '8px 16px 4px',
-    textShadow: '0 0 8px rgba(255,215,0,0.4)',
+    padding: '10px 16px 4px',
   },
   nowPlayingCard: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
     padding: '10px 16px',
-    background: 'linear-gradient(90deg, #1a0008, #200010)',
-    borderLeft: '4px solid #e60026',
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderLeft: '3px solid #ff0066',
     marginBottom: 8,
-    boxShadow: 'inset 0 0 20px rgba(230,0,38,0.1)',
+    marginLeft: 16,
+    marginRight: 16,
+    borderRadius: 8,
   },
   queueItem: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
     padding: '10px 16px',
-    borderBottom: '1px solid #1a1010',
+    marginBottom: 6,
+    marginLeft: 16,
+    marginRight: 16,
+    borderRadius: 8,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.12)',
   },
   position: {
-    color: '#e60026',
     fontSize: 14,
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 900,
@@ -125,7 +164,7 @@ const styles: Record<string, React.CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   songArtist: {
-    color: '#888',
+    color: '#ff6699',
     fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
     marginTop: 2,
@@ -133,19 +172,10 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  nowPlayingBadge: {
-    color: '#ffd700',
-    fontSize: 11,
-    fontFamily: 'system-ui, sans-serif',
-    marginTop: 4,
-    fontWeight: 700,
-    letterSpacing: 0.5,
-    textShadow: '0 0 6px rgba(255,215,0,0.5)',
-  },
   removeBtn: {
-    background: 'rgba(230,0,38,0.1)',
-    border: '1px solid #3a1010',
-    color: '#888',
+    background: 'rgba(255,0,102,0.15)',
+    border: '1px solid rgba(255,0,102,0.3)',
+    color: '#ff0066',
     fontSize: 18,
     width: 30,
     height: 30,
@@ -169,13 +199,13 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 8,
   },
   emptyText: {
-    color: '#555',
+    color: '#00eeff',
     fontSize: 18,
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 600,
   },
   emptyHint: {
-    color: '#444',
+    color: 'rgba(0,238,255,0.6)',
     fontSize: 14,
     fontFamily: 'system-ui, sans-serif',
   },
