@@ -10,9 +10,11 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w monitor\" \"npm run dev -w controller\"",
-    "build": "npm run build -w shared && npm run build -w server && npm run build -w monitor && npm run build -w controller"
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w monitor && npm run build -w controller",
+    "spotify-auth": "ts-node scripts/spotify-auth.ts"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2"
   }
 }
