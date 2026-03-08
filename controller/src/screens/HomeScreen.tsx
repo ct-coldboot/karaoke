@@ -12,14 +12,14 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <div style={styles.logo}>KARAOKE HOME</div>
-        <div style={styles.subtitle}>Your personal karaoke system</div>
-      </div>
+        <div style={styles.logo}>♪ KARAOKE HOME</div>
+        <div style={styles.subtitle}>カラオケホーム · YOUR PERSONAL KARAOKE SYSTEM</div>
 
-      <button style={styles.searchBar} onClick={onGoSearch}>
-        <span style={styles.searchIcon}>🔍</span>
-        <span style={styles.searchPlaceholder}>Search songs...</span>
-      </button>
+        <button style={styles.searchBar} onClick={onGoSearch}>
+          <span style={styles.searchIcon}>🔍</span>
+          <span style={styles.searchPlaceholder}>Search songs...</span>
+        </button>
+      </div>
 
       {mode !== 'idle' && currentSong && (
         <div style={styles.section}>
@@ -67,44 +67,51 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     flex: 1,
     overflowY: 'auto',
-    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: 16,
+    gap: 0,
   },
   header: {
-    paddingTop: 8,
+    background: 'linear-gradient(135deg, #1a0000 0%, #2d0010 60%, #1a0000 100%)',
+    borderBottom: '2px solid #e60026',
+    padding: '16px 16px 12px',
+    boxShadow: '0 4px 16px rgba(230,0,38,0.3)',
   },
   logo: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 900,
     fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 2,
+    letterSpacing: 3,
+    textShadow: '0 0 20px rgba(230,0,38,0.8)',
   },
   subtitle: {
-    color: '#555',
-    fontSize: 13,
+    color: '#ffd700',
+    fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
-    marginTop: 4,
+    marginTop: 2,
+    letterSpacing: 2,
+    fontWeight: 600,
   },
   searchBar: {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
     padding: '12px 16px',
-    background: '#222',
-    border: '1px solid #333',
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid #e60026',
     borderRadius: 10,
     cursor: 'pointer',
     width: '100%',
     textAlign: 'left',
+    marginTop: 10,
+    boxSizing: 'border-box',
   },
   searchIcon: {
     fontSize: 16,
   },
   searchPlaceholder: {
-    color: '#555',
+    color: '#888',
     fontSize: 15,
     fontFamily: 'system-ui, sans-serif',
   },
@@ -112,23 +119,26 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: 8,
+    padding: '14px 16px 0',
   },
   sectionTitle: {
-    color: '#888',
+    color: '#ffd700',
     fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
-    fontWeight: 700,
-    letterSpacing: 1,
+    fontWeight: 800,
+    letterSpacing: 2,
     textTransform: 'uppercase',
+    textShadow: '0 0 8px rgba(255,215,0,0.4)',
   },
   nowPlayingCard: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
     padding: '10px',
-    background: '#1a1a1a',
+    background: 'linear-gradient(90deg, #1a0008, #200010)',
     borderRadius: 8,
-    border: '1px solid #dc3232',
+    border: '1px solid #e60026',
+    boxShadow: '0 0 16px rgba(230,0,38,0.25)',
   },
   nowPlayingThumb: {
     width: 72,
@@ -136,6 +146,7 @@ const styles: Record<string, React.CSSProperties> = {
     objectFit: 'cover',
     borderRadius: 4,
     flexShrink: 0,
+    border: '1px solid #e60026',
   },
   nowPlayingInfo: {
     flex: 1,
@@ -144,14 +155,14 @@ const styles: Record<string, React.CSSProperties> = {
   nowPlayingTitle: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: 700,
     fontFamily: 'system-ui, sans-serif',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
   nowPlayingArtist: {
-    color: '#888',
+    color: '#ffd700',
     fontSize: 12,
     fontFamily: 'system-ui, sans-serif',
     marginTop: 4,
@@ -161,8 +172,9 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 12,
     padding: '8px 10px',
-    background: '#1a1a1a',
-    borderRadius: 8,
+    background: '#1a1010',
+    borderRadius: 6,
+    border: '1px solid #2a1010',
   },
   queueThumb: {
     width: 54,
@@ -185,17 +197,18 @@ const styles: Record<string, React.CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   queueArtist: {
-    color: '#666',
+    color: '#888',
     fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
     marginTop: 2,
   },
   moreItems: {
-    color: '#555',
+    color: '#ffd700',
     fontSize: 12,
     fontFamily: 'system-ui, sans-serif',
     textAlign: 'center',
     padding: '4px 0',
+    opacity: 0.6,
   },
   emptyState: {
     display: 'flex',

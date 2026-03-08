@@ -8,20 +8,41 @@ interface Props {
 export default function TransitionScreen({ song }: Props) {
   return (
     <div style={styles.container}>
+      {/* Background */}
+      <div style={styles.bg} />
+
+      {/* Card */}
       <div style={styles.card}>
+        {/* Header: logo bar */}
         <div style={styles.header}>
-          <div style={styles.brandBox}>
-            <span style={styles.brandText}>Karaoke Home</span>
+          <div style={styles.logoMark}>
+            <span style={styles.logoNote}>♪</span>
+            <div style={styles.logoTextBlock}>
+              <div style={styles.logoKana}>カラオケ</div>
+              <div style={styles.logoLatin}>KARAOKE HOME</div>
+            </div>
+            <span style={styles.logoNote}>♬</span>
           </div>
-          <div style={styles.infoLabel}>information</div>
+          <div style={styles.infoTag}>インフォメーション · INFORMATION</div>
         </div>
-        <div style={styles.divider} />
-        <div style={styles.upNext}>
-          <span style={styles.arrow}>▶</span>
-          <span style={styles.upNextLabel}>Up Next</span>
+
+        {/* Gold accent bar */}
+        <div style={styles.goldBar} />
+
+        {/* Body */}
+        <div style={styles.body}>
+          <div style={styles.upNextRow}>
+            <span style={styles.upNextArrow}>▶▶</span>
+            <span style={styles.upNextLabel}>UP NEXT · 次の曲</span>
+          </div>
+          <div style={styles.songTitle}>{song.title}</div>
+          <div style={styles.songArtist}>{song.artist}</div>
         </div>
-        <div style={styles.songTitle}>{song.title}</div>
-        <div style={styles.songArtist}>{song.artist}</div>
+
+        {/* Footer */}
+        <div style={styles.footer}>
+          <span style={styles.footerText}>♩ Please prepare to sing ♩</span>
+        </div>
       </div>
     </div>
   );
@@ -31,78 +52,122 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     width: '100%',
     height: '100%',
-    background: '#fff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  bg: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(160deg, #1a0000 0%, #2d0010 30%, #0a0020 70%, #000 100%)',
   },
   card: {
-    width: 640,
-    background: '#fff',
-    borderRadius: 4,
+    position: 'relative',
+    width: 680,
+    borderRadius: 6,
     overflow: 'hidden',
-    boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
+    boxShadow: '0 0 80px rgba(230,0,38,0.5), 0 20px 60px rgba(0,0,0,0.8)',
+    border: '2px solid #ffd700',
   },
   header: {
-    background: '#dc3232',
+    background: 'linear-gradient(135deg, #cc0020 0%, #ff1a3c 50%, #cc0020 100%)',
     padding: '20px 28px 16px',
     display: 'flex',
-    alignItems: 'baseline',
-    gap: 16,
+    flexDirection: 'column',
+    gap: 6,
   },
-  brandBox: {
+  logoMark: {
     display: 'flex',
     alignItems: 'center',
+    gap: 14,
   },
-  brandText: {
-    color: '#fff',
+  logoNote: {
     fontSize: 28,
+    color: '#ffd700',
+    textShadow: '0 0 10px rgba(255,215,0,0.8)',
+  },
+  logoTextBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  logoKana: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: '#ffd700',
+    letterSpacing: 4,
+    fontFamily: 'system-ui, sans-serif',
+    textShadow: '0 0 8px rgba(255,215,0,0.6)',
+  },
+  logoLatin: {
+    fontSize: 26,
     fontWeight: 900,
-    fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 1,
-  },
-  infoLabel: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 14,
-    fontFamily: 'system-ui, sans-serif',
+    color: '#fff',
     letterSpacing: 2,
-    textTransform: 'lowercase',
+    fontFamily: 'system-ui, sans-serif',
+    textShadow: '0 2px 6px rgba(0,0,0,0.4)',
+    lineHeight: 1,
   },
-  divider: {
-    height: 3,
-    background: '#b02020',
+  infoTag: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    letterSpacing: 3,
+    fontFamily: 'system-ui, sans-serif',
+    marginLeft: 2,
   },
-  upNext: {
-    padding: '24px 28px 8px',
+  goldBar: {
+    height: 4,
+    background: 'linear-gradient(90deg, #b8860b, #ffd700, #ffa500, #ffd700, #b8860b)',
+  },
+  body: {
+    background: '#fff',
+    padding: '28px 32px 24px',
+  },
+  upNextRow: {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
+    marginBottom: 12,
   },
-  arrow: {
-    color: '#dc3232',
-    fontSize: 18,
+  upNextArrow: {
+    color: '#e60026',
+    fontSize: 14,
+    letterSpacing: -2,
   },
   upNextLabel: {
-    color: '#dc3232',
-    fontSize: 16,
-    fontWeight: 700,
+    color: '#e60026',
+    fontSize: 13,
+    fontWeight: 800,
+    letterSpacing: 3,
     fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 2,
     textTransform: 'uppercase',
   },
   songTitle: {
-    padding: '4px 28px 8px',
-    fontSize: 36,
+    fontSize: 40,
     fontWeight: 900,
     color: '#111',
     fontFamily: 'system-ui, sans-serif',
     lineHeight: 1.2,
+    marginBottom: 8,
   },
   songArtist: {
-    padding: '0 28px 28px',
     fontSize: 22,
     color: '#555',
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 400,
+  },
+  footer: {
+    background: '#111',
+    padding: '10px 32px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  footerText: {
+    color: '#ffd700',
+    fontSize: 13,
+    letterSpacing: 3,
+    fontFamily: 'system-ui, sans-serif',
+    fontWeight: 600,
+    textShadow: '0 0 8px rgba(255,215,0,0.5)',
   },
 };

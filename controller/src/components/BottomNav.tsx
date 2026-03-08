@@ -40,9 +40,9 @@ export default function BottomNav({ activeTab, onTabChange, queueCount }: Props)
 const styles: Record<string, React.CSSProperties> = {
   nav: {
     display: 'flex',
-    height: 56,
-    background: '#181818',
-    borderTop: '1px solid #2a2a2a',
+    height: 60,
+    background: 'linear-gradient(180deg, #0f0f0f, #181010)',
+    borderTop: '1px solid #2a1010',
     flexShrink: 0,
   },
   tab: {
@@ -57,15 +57,17 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     position: 'relative',
     padding: '6px 0',
+    borderTop: '3px solid transparent',
   },
   tabActive: {
-    borderTop: '2px solid #dc3232',
+    borderTop: '3px solid #e60026',
+    background: 'rgba(230,0,38,0.08)',
   },
   icon: {
     fontSize: 18,
   },
   label: {
-    color: '#888',
+    color: '#666',
     fontSize: 10,
     fontFamily: 'system-ui, sans-serif',
     letterSpacing: 0.5,
@@ -74,7 +76,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'absolute',
     top: 4,
     right: 'calc(50% - 18px)',
-    background: '#dc3232',
+    background: 'linear-gradient(135deg, #e60026, #ff4455)',
     color: '#fff',
     fontSize: 9,
     fontFamily: 'system-ui, sans-serif',
@@ -86,5 +88,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '0 3px',
+    boxShadow: '0 0 6px rgba(230,0,38,0.6)',
   },
 };

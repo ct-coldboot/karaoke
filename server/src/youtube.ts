@@ -39,6 +39,20 @@ function parseThumbnail(entry: Record<string, unknown>): string {
   return `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
 }
 
+export async function getStreamUrl(videoId: string): Promise<string> {
+  const url = `https://www.youtube.com/watch?v=${videoId}`;
+  const { stdout } = await execFileAsync('yt-dlp', [
+    '-f', 'best[ext=mp4]/best',
+    '--get-url',
+    '--no-playlist',
+    '--no-warnings',
+    url,
+  ]);
+  const lines = stdout.trim().split('\n').filter(Boolean);
+  if (lines.length === 0) throw new Error('No stream URL found');
+  return lines[0];
+}
+
 export async function searchYouTube(query: string, lang: string): Promise<SearchResult[]> {
   const cacheKey = `${lang}:${query}`;
   const cached = cache.get(cacheKey);

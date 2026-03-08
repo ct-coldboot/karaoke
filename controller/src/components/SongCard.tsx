@@ -29,7 +29,9 @@ export default function SongCard({ song, onAdd }: Props) {
         onClick={() => onAdd(song)}
         aria-label="Add to queue"
       >
-        +
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 3v12M3 9h12" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
       </button>
     </div>
   );
@@ -40,7 +42,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     padding: '10px 16px',
-    borderBottom: '1px solid #222',
+    borderBottom: '1px solid #1a1010',
     gap: 12,
   },
   thumb: {
@@ -78,15 +80,13 @@ const styles: Record<string, React.CSSProperties> = {
     height: 36,
     borderRadius: '50%',
     border: 'none',
-    background: '#dc3232',
+    background: 'linear-gradient(135deg, #cc0020, #e60026)',
     color: '#fff',
-    fontSize: 22,
-    lineHeight: '1',
     cursor: 'pointer',
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: 'system-ui, sans-serif',
+    boxShadow: '0 0 10px rgba(230,0,38,0.4)',
   },
 };

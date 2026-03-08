@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Song, QueueState } from '@karaoke/shared';
 
 interface Props {
@@ -16,8 +16,9 @@ declare global {
           videoId: string;
           playerVars?: Record<string, string | number>;
           events?: {
-            onReady?: (event: { target: YTPlayer }) => void;
+            onReady?: () => void;
             onStateChange?: (event: { data: number }) => void;
+            onError?: (event: { data: number }) => void;
           };
         }
       ) => YTPlayer;
@@ -61,11 +62,39 @@ function loadYTApi(cb: () => void) {
 
 export default function PlayingMode({ song, queueState, onEnded }: Props) {
   const playerRef = useRef<YTPlayer | null>(null);
+  const playerReadyRef = useRef<boolean>(false);
   const currentVideoId = useRef<string>('');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
+  // Ref so the YT onError callback always has the latest song.youtubeId without stale closure
+  const fetchStreamRef = useRef<() => void>(() => {});
+  fetchStreamRef.current = () => {
+    setStreamUrl(`/api/stream/${song.youtubeId}/proxy`);
+  };
+
+  // Reset to YT player when song changes
   useEffect(() => {
+    setStreamUrl(null);
+  }, [song.youtubeId]);
+
+  // Destroy YT player when switching to native video
+  useEffect(() => {
+    if (!streamUrl) return;
+    if (playerRef.current) {
+      playerRef.current.destroy();
+      playerRef.current = null;
+      playerReadyRef.current = false;
+      currentVideoId.current = '';
+    }
+  }, [streamUrl]);
+
+  // YT IFrame player (used when streamUrl is null)
+  useEffect(() => {
+    if (streamUrl) return;
     loadYTApi(() => {
       if (!playerRef.current) {
+        playerReadyRef.current = false;
         playerRef.current = new window.YT.Player('yt-player', {
           videoId: song.youtubeId,
           playerVars: {
@@ -77,9 +106,18 @@ export default function PlayingMode({ song, queueState, onEnded }: Props) {
             iv_load_policy: 3,
           },
           events: {
+            onReady: () => {
+              playerReadyRef.current = true;
+            },
             onStateChange: (event) => {
               if (event.data === window.YT.PlayerState.ENDED) {
                 onEnded();
+              }
+            },
+            onError: (event) => {
+              // 101 / 150 = embedding disabled by video owner — fall back to direct stream
+              if (event.data === 101 || event.data === 150) {
+                fetchStreamRef.current();
               }
             },
           },
@@ -90,21 +128,28 @@ export default function PlayingMode({ song, queueState, onEnded }: Props) {
         currentVideoId.current = song.youtubeId;
       }
     });
+    return () => {};
+  }, [song.youtubeId, streamUrl]);
 
-    return () => {
-      // Don't destroy on re-render — only when component unmounts
-    };
-  }, [song.youtubeId]);
-
-  // Handle pause/resume from controller
+  // Pause/resume for YT player
   useEffect(() => {
-    if (!playerRef.current) return;
+    if (streamUrl || !playerRef.current || !playerReadyRef.current) return;
     if (queueState.isPlaying) {
       playerRef.current.playVideo();
     } else {
       playerRef.current.pauseVideo();
     }
-  }, [queueState.isPlaying]);
+  }, [queueState.isPlaying, streamUrl]);
+
+  // Pause/resume for native video
+  useEffect(() => {
+    if (!streamUrl || !videoRef.current) return;
+    if (queueState.isPlaying) {
+      void videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+    }
+  }, [queueState.isPlaying, streamUrl]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -112,25 +157,66 @@ export default function PlayingMode({ song, queueState, onEnded }: Props) {
       if (playerRef.current) {
         playerRef.current.destroy();
         playerRef.current = null;
+        playerReadyRef.current = false;
         currentVideoId.current = '';
       }
     };
   }, []);
 
+  const hasQueue = queueState.queue.length > 0;
+  const RIBBON_H = 56;
+
   return (
     <div style={styles.container}>
-      <div id="yt-player" style={styles.player} />
-      <div style={styles.overlay}>
+      {/* Always keep yt-player div mounted — YT IFrame API replaces it with an iframe
+          directly in the DOM, so unmounting it causes a React/DOM mismatch crash */}
+      <div id="yt-player" style={{ ...styles.player, display: streamUrl ? 'none' : 'block' }} />
+
+      {streamUrl && (
+        <video
+          ref={videoRef}
+          src={streamUrl}
+          style={styles.player}
+          autoPlay
+          playsInline
+          onEnded={onEnded}
+        />
+      )}
+
+      {/* Now-playing overlay, sits above ribbon when queue is visible */}
+      <div style={{ ...styles.overlay, bottom: hasQueue ? RIBBON_H : 0 }}>
         <div style={styles.songInfo}>
           <div style={styles.songTitle}>{song.title}</div>
           <div style={styles.songArtist}>{song.artist}</div>
         </div>
-        {queueState.queue.length > 0 && (
-          <div style={styles.queueBadge}>
-            {queueState.queue.length} in queue
-          </div>
-        )}
       </div>
+
+      {/* Queue ribbon — 3-cell strip */}
+      {hasQueue && (
+        <div style={{ ...styles.ribbon, height: RIBBON_H }}>
+          {[0, 1, 2].map((i) => {
+            const queued = queueState.queue[i];
+            return (
+              <div
+                key={i}
+                style={{
+                  ...styles.ribbonCell,
+                  borderLeft: i > 0 ? '1px solid #333' : 'none',
+                  opacity: queued ? 1 : 0.2,
+                }}
+              >
+                {queued && (
+                  <>
+                    <span style={styles.ribbonNum}>{i + 1}</span>
+                    <span style={styles.ribbonTitle}>{queued.title}</span>
+                    <span style={styles.ribbonArtist}>{queued.artist}</span>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -151,7 +237,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   overlay: {
     position: 'absolute',
-    bottom: 0,
     left: 0,
     right: 0,
     padding: '24px 32px',
@@ -178,13 +263,52 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: 'system-ui, sans-serif',
     textShadow: '0 1px 4px rgba(0,0,0,0.8)',
   },
-  queueBadge: {
-    background: 'rgba(220, 50, 50, 0.85)',
+  ribbon: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    background: '#1a1a1a',
+    borderTop: '1px solid #333',
+  },
+  ribbonCell: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '0 14px',
+    overflow: 'hidden',
+    minWidth: 0,
+  },
+  ribbonNum: {
+    color: '#e60026',
+    fontSize: 18,
+    fontWeight: 900,
+    fontFamily: 'system-ui, sans-serif',
+    flexShrink: 0,
+    width: 20,
+    textAlign: 'center',
+  },
+  ribbonTitle: {
     color: '#fff',
     fontSize: 13,
-    fontFamily: 'system-ui, sans-serif',
     fontWeight: 600,
-    padding: '4px 12px',
-    borderRadius: 20,
+    fontFamily: 'system-ui, sans-serif',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    flex: 1,
+    minWidth: 0,
+  },
+  ribbonArtist: {
+    color: '#888',
+    fontSize: 12,
+    fontFamily: 'system-ui, sans-serif',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    flexShrink: 0,
+    maxWidth: '35%',
   },
 };

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
-import { searchYouTube } from './youtube';
+import { searchYouTube, getStreamUrl } from './youtube';
 
 const router = Router();
 
@@ -12,7 +12,16 @@ const searchLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const streamLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: 'Too many stream requests, please slow down' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const VALID_LANGS = new Set(['all', 'en', 'ja']);
+const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
 
 router.get('/search', searchLimiter, async (req: Request, res: Response) => {
   const q = (req.query.q as string | undefined)?.trim();
@@ -39,6 +48,21 @@ router.get('/search', searchLimiter, async (req: Request, res: Response) => {
   } catch (err) {
     console.error('YouTube search error:', err);
     res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+router.get('/stream/:videoId/proxy', streamLimiter, async (req: Request, res: Response) => {
+  const { videoId } = req.params;
+  if (!YOUTUBE_ID_RE.test(videoId)) {
+    res.status(400).json({ error: 'Invalid video ID' });
+    return;
+  }
+  try {
+    const streamUrl = await getStreamUrl(videoId);
+    res.redirect(302, streamUrl);
+  } catch (err) {
+    console.error('Stream URL error:', err);
+    res.status(500).json({ error: 'Could not resolve stream URL' });
   }
 });
 
