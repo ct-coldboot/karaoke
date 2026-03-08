@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { searchYouTube, getStreamUrl } from './youtube';
+import { getSpotifyAccessToken } from './spotify';
 
 const router = Router();
 
@@ -63,6 +64,16 @@ router.get('/stream/:videoId/proxy', streamLimiter, async (req: Request, res: Re
   } catch (err) {
     console.error('Stream URL error:', err);
     res.status(500).json({ error: 'Could not resolve stream URL' });
+  }
+});
+
+router.get('/spotify/token', async (_req, res) => {
+  try {
+    const token = await getSpotifyAccessToken();
+    res.json({ token });
+  } catch (err) {
+    console.error('Spotify token error:', err);
+    res.status(503).json({ error: 'Spotify unavailable' });
   }
 });
 
