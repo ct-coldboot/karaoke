@@ -19,19 +19,17 @@ export default function SongCard({ song, onAdd }: Props) {
       <img src={song.thumbnail} alt="" style={styles.thumb} />
       <div style={styles.info}>
         <div style={styles.title}>{song.title}</div>
-        <div style={styles.meta}>
-          {song.artist}
-          {song.duration ? ` · ${formatDuration(song.duration)}` : ''}
-        </div>
+        <div style={styles.artist}>{song.artist}</div>
+        {song.duration ? (
+          <div style={styles.duration}>{formatDuration(song.duration)}</div>
+        ) : null}
       </div>
       <button
         style={styles.addBtn}
         onClick={() => onAdd(song)}
         aria-label="Add to queue"
       >
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 3v12M3 9h12" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
+        Add to Queue
       </button>
     </div>
   );
@@ -42,8 +40,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     padding: '10px 16px',
-    borderBottom: '1px solid #1a1010',
     gap: 12,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderLeft: '3px solid #ff0066',
+    borderRadius: 6,
+    marginBottom: 8,
   },
   thumb: {
     width: 72,
@@ -61,32 +63,38 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     fontSize: 14,
     fontFamily: 'system-ui, sans-serif',
-    fontWeight: 600,
+    fontWeight: 700,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     marginBottom: 4,
   },
-  meta: {
-    color: '#888',
+  artist: {
+    color: '#ff6699',
     fontSize: 12,
     fontFamily: 'system-ui, sans-serif',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  duration: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 12,
+    fontFamily: 'system-ui, sans-serif',
+  },
   addBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: '50%',
+    padding: '6px 14px',
+    borderRadius: 20,
     border: 'none',
-    background: 'linear-gradient(135deg, #cc0020, #e60026)',
-    color: '#fff',
+    background: 'linear-gradient(135deg, #00eeff, #0088ff)',
+    color: '#001a2a',
+    fontWeight: 700,
+    fontSize: 12,
     cursor: 'pointer',
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 0 10px rgba(230,0,38,0.4)',
+    whiteSpace: 'nowrap',
   },
 };
