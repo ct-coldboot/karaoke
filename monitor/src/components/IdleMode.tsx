@@ -1,10 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import BigEchoLogo from './BigEchoLogo';
-import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 
 export default function IdleMode() {
-  useSpotifyPlayer(true);
   useAnnouncements(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);

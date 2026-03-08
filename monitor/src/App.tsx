@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSocket } from './hooks/useSocket';
+import { useSpotifyPlayer } from './hooks/useSpotifyPlayer';
 import IdleMode from './components/IdleMode';
 import TransitionScreen from './components/TransitionScreen';
 import PlayingMode from './components/PlayingMode';
@@ -7,6 +8,8 @@ import PlayingMode from './components/PlayingMode';
 export default function App() {
   const { queueState, emitSongEnded } = useSocket();
   const [activated, setActivated] = useState(false);
+  // Player lives for the page lifetime — just pauses/plays, never disconnects
+  useSpotifyPlayer(activated && queueState.mode === 'idle');
 
   if (!activated) {
     return (
