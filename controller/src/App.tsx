@@ -54,7 +54,8 @@ const styles: Record<string, React.CSSProperties> = {
     height: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    background: '#0a0a0a',
+    background: '#0a0014',
+    fontFamily: 'system-ui, sans-serif',
     overflow: 'hidden',
   },
   content: {
