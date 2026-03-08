@@ -6,12 +6,35 @@ interface Props {
   song: Song;
 }
 
+const INTROS = [
+  (title: string, artist: string) => `次の曲は、${artist}で、${title}！みなさん、準備はいいですか？`,
+  (title: string, artist: string) => `さあ、盛り上がってまいりましょう！${artist}の${title}、どうぞ！`,
+  (title: string, artist: string) => `次はこちら！${title}、${artist}でございます。ごゆっくりどうぞ！`,
+  (title: string, artist: string) => `お待たせしました！${artist}より、${title}をお楽しみください！`,
+  (title: string, artist: string) => `それでは参ります！${title}、${artist}！レッツゴー！`,
+];
+
+function announce(title: string, artist: string) {
+  window.speechSynthesis.cancel();
+  const template = INTROS[Math.floor(Math.random() * INTROS.length)];
+  const utt = new SpeechSynthesisUtterance(template(title, artist));
+  utt.lang = 'ja-JP';
+  utt.rate = 0.95;
+  utt.pitch = 1.1;
+  window.speechSynthesis.speak(utt);
+}
+
 export default function TransitionScreen({ song }: Props) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 50);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    announce(song.title, song.artist);
+    return () => { window.speechSynthesis.cancel(); };
+  }, [song.title, song.artist]);
 
   return (
     <div style={styles.container}>
