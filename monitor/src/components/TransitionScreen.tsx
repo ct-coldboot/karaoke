@@ -7,11 +7,11 @@ interface Props {
 }
 
 const INTROS = [
-  (title: string, artist: string) => `次の曲は、${artist}で、${title}！みなさん、準備はいいですか？`,
-  (title: string, artist: string) => `さあ、盛り上がってまいりましょう！${artist}の${title}、どうぞ！`,
-  (title: string, artist: string) => `次はこちら！${title}、${artist}でございます。ごゆっくりどうぞ！`,
-  (title: string, artist: string) => `お待たせしました！${artist}より、${title}をお楽しみください！`,
-  (title: string, artist: string) => `それでは参ります！${title}、${artist}！レッツゴー！`,
+  (title: string, artist: string) => `次は、${artist}で${title}！`,
+  (title: string, artist: string) => `${title}、${artist}！どうぞ！`,
+  (title: string, artist: string) => `${artist}の${title}！レッツゴー！`,
+  (title: string, artist: string) => `次の曲は${title}！${artist}！`,
+  (title: string, artist: string) => `${title}、いきまーす！`,
 ];
 
 function announce(title: string, artist: string) {
