@@ -14,22 +14,29 @@ export default function NowPlayingBar({ queueState, onSkip, onPause, onResume }:
 
   return (
     <div style={styles.bar}>
+      <style>{`
+        @keyframes npb-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.7); }
+        }
+      `}</style>
+      <div style={styles.dot} aria-hidden="true" />
       <img src={currentSong.thumbnail} alt="" style={styles.thumb} />
       <div style={styles.info}>
         <div style={styles.title}>{currentSong.title}</div>
-        <div style={styles.status}>
+        <div style={styles.artist}>
           {mode === 'transition' ? 'Starting soon...' : isPlaying ? 'Now Playing' : 'Paused'}
         </div>
       </div>
       <div style={styles.controls}>
         {mode === 'playing' && (
           isPlaying ? (
-            <button style={styles.btn} onClick={onPause} aria-label="Pause">⏸</button>
+            <button style={styles.pauseBtn} onClick={onPause} aria-label="Pause">⏸</button>
           ) : (
-            <button style={styles.btn} onClick={onResume} aria-label="Resume">▶</button>
+            <button style={styles.pauseBtn} onClick={onResume} aria-label="Resume">▶</button>
           )
         )}
-        <button style={styles.btn} onClick={onSkip} aria-label="Skip">⏭</button>
+        <button style={styles.skipBtn} onClick={onSkip} aria-label="Skip">⏭</button>
       </div>
     </div>
   );
@@ -40,12 +47,21 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     padding: '8px 16px',
-    background: 'linear-gradient(90deg, #1a0008, #200010, #1a0008)',
-    borderTop: '2px solid #e60026',
+    background: 'linear-gradient(135deg, #1a0033, #330011)',
+    borderTop: '2px solid #ff0066',
     gap: 12,
     height: 64,
     flexShrink: 0,
-    boxShadow: '0 -4px 20px rgba(230,0,38,0.3)',
+    boxShadow: '0 -4px 24px rgba(255,0,102,0.35)',
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    background: '#ff0066',
+    flexShrink: 0,
+    boxShadow: '0 0 6px #ff0066',
+    animation: 'npb-pulse 1.4s ease-in-out infinite',
   },
   thumb: {
     width: 48,
@@ -54,7 +70,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 3,
     flexShrink: 0,
     background: '#333',
-    border: '1px solid #e60026',
+    border: '1px solid #ff0066',
   },
   info: {
     flex: 1,
@@ -69,8 +85,8 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  status: {
-    color: '#ffd700',
+  artist: {
+    color: '#ff6699',
     fontSize: 11,
     fontFamily: 'system-ui, sans-serif',
     marginTop: 2,
@@ -82,10 +98,10 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     flexShrink: 0,
   },
-  btn: {
-    background: 'rgba(230,0,38,0.15)',
-    border: '1px solid #e60026',
-    color: '#fff',
+  pauseBtn: {
+    background: 'rgba(255,0,102,0.15)',
+    border: '1px solid #ff0066',
+    color: '#ff0066',
     fontSize: 18,
     width: 36,
     height: 36,
@@ -94,5 +110,20 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    boxShadow: '0 0 10px rgba(255,0,102,0.5)',
+  },
+  skipBtn: {
+    background: 'rgba(0,238,255,0.1)',
+    border: '1px solid #00eeff',
+    color: '#00eeff',
+    fontSize: 18,
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 0 10px rgba(0,238,255,0.4)',
   },
 };
