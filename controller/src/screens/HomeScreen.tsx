@@ -11,9 +11,12 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
 
   return (
     <div style={styles.container}>
+      {/* Header */}
       <div style={styles.header}>
-        <div style={styles.logo}>♪ KARAOKE HOME</div>
-        <div style={styles.subtitle}>カラオケホーム · YOUR PERSONAL KARAOKE SYSTEM</div>
+        <div style={styles.logoStrip}>
+          <div style={styles.logoText}>BIG ECHO</div>
+          <div style={styles.logoSub}>Karaoke Entertainment</div>
+        </div>
 
         <button style={styles.searchBar} onClick={onGoSearch}>
           <span style={styles.searchIcon}>🔍</span>
@@ -21,9 +24,10 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
         </button>
       </div>
 
+      {/* Now Playing */}
       {mode !== 'idle' && currentSong && (
         <div style={styles.section}>
-          <div style={styles.sectionTitle}>Now Playing</div>
+          <div style={sectionPill('#ff0066')}>NOW PLAYING</div>
           <div style={styles.nowPlayingCard}>
             <img src={currentSong.thumbnail} alt="" style={styles.nowPlayingThumb} />
             <div style={styles.nowPlayingInfo}>
@@ -34,9 +38,10 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
         </div>
       )}
 
+      {/* Up Next */}
       {queue.length > 0 && (
         <div style={styles.section}>
-          <div style={styles.sectionTitle}>Up Next ({queue.length})</div>
+          <div style={sectionPill('#00eeff')}>UP NEXT ({queue.length})</div>
           {queue.slice(0, 3).map((song) => (
             <div key={song.id} style={styles.queueItem}>
               <img src={song.thumbnail} alt="" style={styles.queueThumb} />
@@ -52,6 +57,7 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
         </div>
       )}
 
+      {/* Empty state */}
       {mode === 'idle' && queue.length === 0 && (
         <div style={styles.emptyState}>
           <div style={styles.emptyIcon}>🎤</div>
@@ -63,6 +69,23 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
   );
 }
 
+function sectionPill(color: string): React.CSSProperties {
+  return {
+    display: 'inline-block',
+    alignSelf: 'flex-start',
+    background: `${color}22`,
+    border: `1px solid ${color}`,
+    color: color,
+    fontSize: 10,
+    fontWeight: 800,
+    fontFamily: 'system-ui, sans-serif',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    borderRadius: 20,
+    padding: '3px 10px',
+  };
+}
+
 const styles: Record<string, React.CSSProperties> = {
   container: {
     flex: 1,
@@ -70,48 +93,59 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
+    background: '#0a0014',
   },
   header: {
-    background: 'linear-gradient(135deg, #1a0000 0%, #2d0010 60%, #1a0000 100%)',
-    borderBottom: '2px solid #e60026',
-    padding: '16px 16px 12px',
-    boxShadow: '0 4px 16px rgba(230,0,38,0.3)',
+    padding: '12px 16px 14px',
+    background: '#0a0014',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
   },
-  logo: {
+  logoStrip: {
+    background: '#cc0000',
+    borderRadius: 6,
+    padding: '8px 14px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  logoText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 900,
     fontFamily: 'system-ui, sans-serif',
-    letterSpacing: 3,
-    textShadow: '0 0 20px rgba(230,0,38,0.8)',
+    letterSpacing: 4,
+    lineHeight: 1,
   },
-  subtitle: {
-    color: '#ffd700',
-    fontSize: 11,
+  logoSub: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 10,
     fontFamily: 'system-ui, sans-serif',
-    marginTop: 2,
     letterSpacing: 2,
     fontWeight: 600,
+    marginTop: 2,
+    textTransform: 'uppercase',
   },
   searchBar: {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
-    padding: '12px 16px',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid #e60026',
+    padding: '11px 14px',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1.5px solid #ff0066',
     borderRadius: 10,
     cursor: 'pointer',
     width: '100%',
     textAlign: 'left',
-    marginTop: 10,
     boxSizing: 'border-box',
+    boxShadow: '0 0 10px rgba(255,0,102,0.15)',
   },
   searchIcon: {
-    fontSize: 16,
+    fontSize: 15,
   },
   searchPlaceholder: {
-    color: '#888',
+    color: '#666',
     fontSize: 15,
     fontFamily: 'system-ui, sans-serif',
   },
@@ -121,24 +155,15 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     padding: '14px 16px 0',
   },
-  sectionTitle: {
-    color: '#ffd700',
-    fontSize: 11,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 800,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    textShadow: '0 0 8px rgba(255,215,0,0.4)',
-  },
   nowPlayingCard: {
     display: 'flex',
     alignItems: 'center',
     gap: 12,
     padding: '10px',
-    background: 'linear-gradient(90deg, #1a0008, #200010)',
+    background: 'rgba(255,0,102,0.06)',
     borderRadius: 8,
-    border: '1px solid #e60026',
-    boxShadow: '0 0 16px rgba(230,0,38,0.25)',
+    border: '1px solid rgba(255,0,102,0.3)',
+    boxShadow: '0 0 12px rgba(255,0,102,0.1)',
   },
   nowPlayingThumb: {
     width: 72,
@@ -146,7 +171,7 @@ const styles: Record<string, React.CSSProperties> = {
     objectFit: 'cover',
     borderRadius: 4,
     flexShrink: 0,
-    border: '1px solid #e60026',
+    border: '1px solid rgba(255,0,102,0.4)',
   },
   nowPlayingInfo: {
     flex: 1,
@@ -162,7 +187,7 @@ const styles: Record<string, React.CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   nowPlayingArtist: {
-    color: '#ffd700',
+    color: '#ff0066',
     fontSize: 12,
     fontFamily: 'system-ui, sans-serif',
     marginTop: 4,
@@ -172,9 +197,9 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 12,
     padding: '8px 10px',
-    background: '#1a1010',
+    background: 'rgba(0,238,255,0.04)',
     borderRadius: 6,
-    border: '1px solid #2a1010',
+    border: '1px solid rgba(0,238,255,0.12)',
   },
   queueThumb: {
     width: 54,
@@ -203,7 +228,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: 2,
   },
   moreItems: {
-    color: '#ffd700',
+    color: '#00eeff',
     fontSize: 12,
     fontFamily: 'system-ui, sans-serif',
     textAlign: 'center',
@@ -223,13 +248,13 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 8,
   },
   emptyText: {
-    color: '#555',
+    color: '#00eeff',
     fontSize: 18,
     fontFamily: 'system-ui, sans-serif',
     fontWeight: 600,
   },
   emptyHint: {
-    color: '#444',
+    color: 'rgba(0,238,255,0.5)',
     fontSize: 14,
     fontFamily: 'system-ui, sans-serif',
   },
