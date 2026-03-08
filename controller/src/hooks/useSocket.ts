@@ -23,8 +23,8 @@ export function useSocket() {
     };
   }, []);
 
-  function addToQueue(song: SearchResult) {
-    socketRef.current.emit(Events.ADD_TO_QUEUE, { song });
+  function addToQueue(song: SearchResult, queuedBy?: string) {
+    socketRef.current.emit(Events.ADD_TO_QUEUE, { song, queuedBy });
   }
 
   function removeFromQueue(songId: string) {

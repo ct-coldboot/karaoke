@@ -37,7 +37,7 @@ export function getState(): QueueState {
   return state;
 }
 
-export function addToQueue(result: SearchResult): void {
+export function addToQueue(result: SearchResult, queuedBy?: string): void {
   const song: Song = {
     id: uuidv4(),
     youtubeId: result.youtubeId,
@@ -46,6 +46,7 @@ export function addToQueue(result: SearchResult): void {
     duration: result.duration,
     thumbnail: result.thumbnail,
     addedAt: Date.now(),
+    ...(queuedBy ? { queuedBy } : {}),
   };
 
   if (state.mode === 'idle') {

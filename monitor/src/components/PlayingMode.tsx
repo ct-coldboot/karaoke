@@ -208,7 +208,12 @@ export default function PlayingMode({ song, queueState, onEnded }: Props) {
                 {queued && (
                   <>
                     <span style={styles.ribbonNum}>{i + 1}</span>
-                    <span style={styles.ribbonTitle}>{queued.title}</span>
+                    <span style={styles.ribbonTitleGroup}>
+                      {queued.queuedBy && (
+                        <span style={styles.ribbonName}>{queued.queuedBy}</span>
+                      )}
+                      <span style={styles.ribbonTitle}>{queued.title}</span>
+                    </span>
                     <span style={styles.ribbonArtist}>{queued.artist}</span>
                   </>
                 )}
@@ -290,6 +295,24 @@ const styles: Record<string, React.CSSProperties> = {
     width: 20,
     textAlign: 'center',
   },
+  ribbonTitleGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    minWidth: 0,
+    overflow: 'hidden',
+  },
+  ribbonName: {
+    color: '#ffe600',
+    fontSize: 10,
+    fontWeight: 700,
+    fontFamily: 'system-ui, sans-serif',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
   ribbonTitle: {
     color: '#fff',
     fontSize: 13,
@@ -298,8 +321,6 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    flex: 1,
-    minWidth: 0,
   },
   ribbonArtist: {
     color: '#888',

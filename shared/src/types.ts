@@ -6,6 +6,7 @@ export interface Song {
   duration: number;
   thumbnail: string;
   addedAt: number;
+  queuedBy?: string;
 }
 
 export interface QueueState {

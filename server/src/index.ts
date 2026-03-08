@@ -64,7 +64,11 @@ io.on('connection', (socket) => {
       console.warn('ADD_TO_QUEUE: invalid payload from', socket.id);
       return;
     }
-    addToQueue((data as { song: SearchResult }).song);
+    const payload = data as { song: SearchResult; queuedBy?: unknown };
+    const queuedBy = typeof payload.queuedBy === 'string' && payload.queuedBy.trim()
+      ? payload.queuedBy.trim().slice(0, 30)
+      : undefined;
+    addToQueue(payload.song, queuedBy);
   });
 
   socket.on(Events.REMOVE_FROM_QUEUE, (data: unknown) => {

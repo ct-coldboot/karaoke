@@ -5,10 +5,22 @@ import NowPlayingBar from './components/NowPlayingBar';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
 import QueueScreen from './screens/QueueScreen';
+import { SearchResult } from '@karaoke/shared';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const { queueState, addToQueue, removeFromQueue, skip, pause, resume } = useQueue();
+  const [name, setName] = useState<string>(() => localStorage.getItem('karaoke_name') ?? '');
+
+  function handleNameChange(n: string) {
+    setName(n);
+    if (n) localStorage.setItem('karaoke_name', n);
+    else localStorage.removeItem('karaoke_name');
+  }
+
+  function handleAddToQueue(song: SearchResult) {
+    addToQueue(song, name.trim() || undefined);
+  }
 
   function handleTabChange(tab: Tab) {
     setActiveTab(tab);
@@ -20,11 +32,13 @@ export default function App() {
         {activeTab === 'home' && (
           <HomeScreen
             queueState={queueState}
+            name={name}
+            onNameChange={handleNameChange}
             onGoSearch={() => setActiveTab('search')}
           />
         )}
         {activeTab === 'search' && (
-          <SearchScreen onAdd={addToQueue} />
+          <SearchScreen onAdd={handleAddToQueue} />
         )}
         {activeTab === 'queue' && (
           <QueueScreen

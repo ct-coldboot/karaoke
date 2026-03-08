@@ -3,10 +3,12 @@ import { QueueState } from '@karaoke/shared';
 
 interface Props {
   queueState: QueueState;
+  name: string;
+  onNameChange: (name: string) => void;
   onGoSearch: () => void;
 }
 
-export default function HomeScreen({ queueState, onGoSearch }: Props) {
+export default function HomeScreen({ queueState, name, onNameChange, onGoSearch }: Props) {
   const { currentSong, queue, mode } = queueState;
 
   return (
@@ -17,6 +19,15 @@ export default function HomeScreen({ queueState, onGoSearch }: Props) {
           <div style={styles.logoText}>BIG ECHO</div>
           <div style={styles.logoSub}>Karaoke Entertainment</div>
         </div>
+
+        <input
+          style={styles.nameInput}
+          type="text"
+          placeholder="Your name (optional)"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
+          maxLength={30}
+        />
 
         <button style={styles.searchBar} onClick={onGoSearch}>
           <span style={styles.searchIcon}>🔍</span>
@@ -126,6 +137,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     marginTop: 2,
     textTransform: 'uppercase',
+  },
+  nameInput: {
+    padding: '10px 14px',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1.5px solid rgba(255,230,0,0.4)',
+    borderRadius: 10,
+    color: '#ffe600',
+    fontSize: 15,
+    fontFamily: 'system-ui, sans-serif',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    outline: 'none',
   },
   searchBar: {
     display: 'flex',
